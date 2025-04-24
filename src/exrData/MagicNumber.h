@@ -47,4 +47,5 @@ namespace exr
 		*/
 		return exr_magicNum;
 	}
+
 }

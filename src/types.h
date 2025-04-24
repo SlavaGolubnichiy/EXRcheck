@@ -2,9 +2,4 @@
 
 #include <cstdint>
 
-//namespace project
-//{
-
-using ui8 = uint8_t;
-
-//}
+using ui8 = uint8_t;	// project-scope alias for "byte"

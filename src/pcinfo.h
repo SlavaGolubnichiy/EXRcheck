@@ -59,17 +59,26 @@ namespace pcinfo
 
 	#endif
 
+	std::string Configuration()
+	{
+		#if _DEBUG
+			return "DEBUG";
+		#else
+			return "RELEASE";
+		#endif
+	}
+
 	class System
 	{
 		public:
 		System()
-			: u_isBigEndian(isBigEndianPC())
+			: m_isBigEndian(isBigEndianPC())
 		{
 		}
 
 		std::string isBigEndianToString() const
 		{
-			switch(u_isBigEndian)
+			switch(m_isBigEndian)
 			{
 				case 1: return "big-endian (most significant byte first)";
 				case 0: return "little-endian (least significant byte first)";
@@ -79,7 +88,7 @@ namespace pcinfo
 		}
 
 		private:
-		int u_isBigEndian = 0xFF;
+		int m_isBigEndian = 0xFF;
 	};
 
 }

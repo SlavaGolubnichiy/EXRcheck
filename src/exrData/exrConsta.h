@@ -10,35 +10,35 @@ namespace exr
 		/* document tag [STD-ATTRIBUTE-01] */
 		namespace StdAttribName
 		{
-			inline static const std::string channels = "channels";
-			inline static const std::string compression = "compression";
-			inline static const std::string dataWindow = "dataWindow";
-			inline static const std::string displayWindow = "displayWindow";
-			inline static const std::string lineOrder = "lineOrder";
-			inline static const std::string pixelAspectRatio = "pixelAspectRatio";
-			inline static const std::string screenWindowCenter = "screenWindowCenter";
-			inline static const std::string screenWindowWidth = "screenWindowWidth";
+			inline static const std::string s_channels = "channels";
+			inline static const std::string s_compression = "compression";
+			inline static const std::string s_dataWindow = "dataWindow";
+			inline static const std::string s_displayWindow = "displayWindow";
+			inline static const std::string s_lineOrder = "lineOrder";
+			inline static const std::string s_pixelAspectRatio = "pixelAspectRatio";
+			inline static const std::string s_screenWindowCenter = "screenWindowCenter";
+			inline static const std::string s_screenWindowWidth = "screenWindowWidth";
 		};
 
 		/* document tag [STD-ATTRIBUTE-01] */
 		namespace Type
 		{
-			inline static const std::string chlist = "chlist";
-			inline static const std::string compression = "compression";
-			inline static const std::string box2i = "box2i";
-			inline static const std::string lineOrder = "lineOrder";
-			inline static const std::string float32 = "float";
-			inline static const std::string v2f = "v2f";
+			inline static const std::string s_chlist = "chlist";
+			inline static const std::string s_compression = "compression";
+			inline static const std::string s_box2i = "box2i";
+			inline static const std::string s_lineOrder = "lineOrder";
+			inline static const std::string s_float32 = "float";
+			inline static const std::string s_v2f = "v2f";
 		};
 
 		/* document tag [EXR-ATTRIB-TYPES-01] */
 		namespace TypeValueSizeBytes
 		{
-			inline static const uint32_t compression= 1;
-			inline static const uint32_t box2i		= 4 * sizeof(uint32_t);
-			inline static const uint32_t lineOrder	= 1;
-			inline static const uint32_t float32	= sizeof(float);
-			inline static const uint32_t v2f		= 2 * sizeof(float);
+			inline static const uint32_t s_compression= 1;
+			inline static const uint32_t s_box2i		= 4 * sizeof(uint32_t);
+			inline static const uint32_t s_lineOrder	= 1;
+			inline static const uint32_t s_float32	= sizeof(float);
+			inline static const uint32_t s_v2f		= 2 * sizeof(float);
 		};
 
 	}
@@ -49,17 +49,17 @@ namespace exr2
 {
 	namespace consta
 	{
-		const uint32_t magicNumber = 0x01312F76;
-		const uint8_t versionNumber = 0x02;
+		const uint32_t c_magicNumber = 0x01312F76; const uint32_t c_magicNumber_firstByteIndex = 0, c_magicNumber_lastByteIndex = 3;
+		const uint8_t c_versionNumber = 0x02;
 
 		/* document tag [VERSIONFIELD-02] */
 		namespace ValidVersionField
 		{
-			inline constexpr uint32_t singleScan			= 0;			// bits 9, 10, 11, 12: 0, 0, 0, 0
-			inline constexpr uint32_t singleTile			= 0x00000200;	// bits 9, 10, 11, 12: 1, ~, 0, 0
-			inline constexpr uint32_t multiScanOrTile		= 0x00001000;	// bits 9, 10, 11, 12: 0, ~, 0, 1
-			inline constexpr uint32_t singleDeepScanOrTile	= 0x00000800;	// bits 9, 10, 11, 12: 0, ~, 1, 0
-			inline constexpr uint32_t multiDeepScanOrTile	= 0x00001800;	// bits 9, 10, 11, 12: 0, ~, 1, 1
+			inline constexpr uint32_t c_singleScan			= 0;			// bits 9, 10, 11, 12: 0, 0, 0, 0
+			inline constexpr uint32_t c_singleTile			= 0x00000200;	// bits 9, 10, 11, 12: 1, ~, 0, 0
+			inline constexpr uint32_t c_multiScanOrTile		= 0x00001000;	// bits 9, 10, 11, 12: 0, ~, 0, 1
+			inline constexpr uint32_t c_singleDeepScanOrTile= 0x00000800;	// bits 9, 10, 11, 12: 0, ~, 1, 0
+			inline constexpr uint32_t c_multiDeepScanOrTile	= 0x00001800;	// bits 9, 10, 11, 12: 0, ~, 1, 1
 		}
 
 		namespace channel
@@ -90,7 +90,7 @@ namespace exr2
 			}
 		}
 
-		namespace compression
+		namespace s_compression
 		{
 			static const enum value
 			{
@@ -112,16 +112,16 @@ namespace exr2
 			std::string name;
 			switch(compressionValue)
 			{
-				case compression::value::NO:	name = "NO_COMPRESSION"; break;
-				case compression::value::RLE:	name = "RLE_COMPRESSION"; break;
-				case compression::value::ZIPS:	name = "ZIPS_COMPRESSION"; break;
-				case compression::value::ZIP:	name = "ZIP_COMPRESSION"; break;
-				case compression::value::PIZ:	name = "PIZ_COMPRESSION"; break;
-				case compression::value::PXR24: name = "PXR24_COMPRESSION"; break;
-				case compression::value::B44:	name = "B44_COMPRESSION"; break;
-				case compression::value::B44A:	name = "B44A_COMPRESSION"; break;
-				case compression::value::DWAA:	name = "DWAA_COMPRESSION"; break;
-				case compression::value::DWAB:	name = "DWAB_COMPRESSION"; break;
+				case s_compression::value::NO:		name = "NO_COMPRESSION"; break;
+				case s_compression::value::RLE:		name = "RLE_COMPRESSION"; break;
+				case s_compression::value::ZIPS:	name = "ZIPS_COMPRESSION"; break;
+				case s_compression::value::ZIP:		name = "ZIP_COMPRESSION"; break;
+				case s_compression::value::PIZ:		name = "PIZ_COMPRESSION"; break;
+				case s_compression::value::PXR24:	name = "PXR24_COMPRESSION"; break;
+				case s_compression::value::B44:		name = "B44_COMPRESSION"; break;
+				case s_compression::value::B44A:	name = "B44A_COMPRESSION"; break;
+				case s_compression::value::DWAA:	name = "DWAA_COMPRESSION"; break;
+				case s_compression::value::DWAB:	name = "DWAB_COMPRESSION"; break;
 				default:
 				{
 					throw std::invalid_argument("OpenEXR compression can not have the specified value. Check the documentation.");
@@ -131,7 +131,7 @@ namespace exr2
 			return name;
 		}
 
-		namespace lineOrder
+		namespace s_lineOrder
 		{
 			typedef uint8_t ctype;
 
@@ -143,13 +143,13 @@ namespace exr2
 			};
 		}
 
-		static std::string lineOrderName(const lineOrder::ctype lineOrderValue)
+		static std::string lineOrderName(const s_lineOrder::ctype lineOrderValue)
 		{
 			switch(lineOrderValue)
 			{
-				case lineOrder::value::INCREASING_Y: return "INCREASING_Y"; break;
-				case lineOrder::value::DECREASING_Y: return "DECREASING_Y"; break;
-				case lineOrder::value::RANDOM_Y:	 return "RANDOM_Y"; break;
+				case s_lineOrder::value::INCREASING_Y: return "INCREASING_Y"; break;
+				case s_lineOrder::value::DECREASING_Y: return "DECREASING_Y"; break;
+				case s_lineOrder::value::RANDOM_Y:	 return "RANDOM_Y"; break;
 				default:
 				{
 					throw std::invalid_argument("OpenEXR lineOrder can not have the specified value. Check the documentation.");

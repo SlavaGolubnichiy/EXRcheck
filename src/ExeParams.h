@@ -28,14 +28,14 @@ namespace exe
 			{
 				throw std::invalid_argument("(argc) is less than 0. Program can not have 0 parameters (first parameter is always .exe path and name)");
 			}
-			u_argc = argc_t(argc);
-			u_argvStrings = std::vector<std::string>(u_argc);
-			for (argc_t i = 0; i < u_argc; i++)
+			m_argc = argc_t(argc);
+			m_argvStrings = std::vector<std::string>(m_argc);
+			for (argc_t i = 0; i < m_argc; i++)
 			{
-				u_argvStrings[i] = std::string(argv[i]);
+				m_argvStrings[i] = std::string(argv[i]);
 			}
 			// check that any parameter is not empty string
-			for (argc_t i = 0; i < u_argc; i++)
+			for (argc_t i = 0; i < m_argc; i++)
 			{
 				if (param(i).empty())
 				{
@@ -43,30 +43,30 @@ namespace exe
 				}
 			}
 		}
-		argc_t paramsNum() const { return u_argc; }
+		argc_t paramsNum() const { return m_argc; }
 		std::string param(const argc_t index) const
 		{
-			if (index < u_argc-1 and u_argc-1 < index)
+			if (index < m_argc-1 and m_argc-1 < index)
 			{
 				throw std::invalid_argument("ExeParams::getArgv(index). (index) value is out of valid range [0; u_argc-1]");
 			}
-			return u_argvStrings[index];
+			return m_argvStrings[index];
 		}
-		std::string pathAndName() const { return u_argvStrings[0]; }
+		std::string pathAndName() const { return m_argvStrings[0]; }
 		std::string toString() const
 		{
-			std::string result = "argc = " + std::to_string(u_argc) + "\n";
+			std::string result = "argc = " + std::to_string(m_argc) + "\n";
 			result += "argv[i]: \n";
-			for (argc_t i = 0; i < u_argc; i++)
+			for (argc_t i = 0; i < m_argc; i++)
 			{
-				result += std::to_string(i) + ": " + u_argvStrings[i] + "\n";
+				result += std::to_string(i) + ": " + m_argvStrings[i] + "\n";
 			}
 			return result;
 		}
 
 		private:
-		argc_t u_argc = 0;
-		std::vector<std::string> u_argvStrings;
+		argc_t m_argc = 0;
+		std::vector<std::string> m_argvStrings;
 	};
 }
 
