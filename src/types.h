@@ -5,6 +5,6 @@
 //namespace project
 //{
 
-using u8 = uint8_t;
+using ui8 = uint8_t;
 
 //}

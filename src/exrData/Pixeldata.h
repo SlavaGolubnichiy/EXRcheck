@@ -89,7 +89,7 @@ namespace exrPixeldata
 	class Channel_i_ofPixel
 	{
 		public:
-		Channel_i_ofPixel(const std::vector<u8>& filebytes, const uint32_t valueFirstByteIndex)
+		Channel_i_ofPixel(const std::vector<ui8>& filebytes, const uint32_t valueFirstByteIndex)
 			: u_channelAndByteRange(utils::IndexedValue<channelCType32>(0,0,0))
 		{
 			//tryValidateChannelValueType<channelCType32>();
@@ -141,7 +141,7 @@ namespace exrPixeldata
 	{
 		public:
 		Channel_i_ofScanlinePixels() { /*tryValidateChannelValueType<channelCType32>();*/ }
-		Channel_i_ofScanlinePixels(const std::vector<u8>& filebytes, const uint32_t pixeldataFirstByteIndex, const uint32_t scanlinePixelsNum)
+		Channel_i_ofScanlinePixels(const std::vector<ui8>& filebytes, const uint32_t pixeldataFirstByteIndex, const uint32_t scanlinePixelsNum)
 		{
 			//tryValidateChannelValueType<channelCType32>();
 			uint32_t currentByteIndex = pixeldataFirstByteIndex;
@@ -229,7 +229,7 @@ namespace exrPixeldata
 		/// <param name="scanlineFirstByteIndex"></param>
 		/// <param name="scanlinePixelsNum"></param>
 		/// <param name="pixelChannelsNum"></param>
-		RegularScanline(const std::vector<u8>& filebytes, const uint32_t scanlineFirstByteIndex, const uint32_t scanlinePixelsNum, const uint32_t pixelChannelsNum)
+		RegularScanline(const std::vector<ui8>& filebytes, const uint32_t scanlineFirstByteIndex, const uint32_t scanlinePixelsNum, const uint32_t pixelChannelsNum)
 			:
 			// calculate scanline generic data filebytes-indexes
 			u_firstByteIndex(scanlineFirstByteIndex),
@@ -352,7 +352,7 @@ namespace exrPixeldata
 	class PixelData
 	{
 		public:
-		PixelData(const std::vector<u8>& filebytes, const uint32_t pixeldataFirstByteIndex, const uint32_t imageRowsNum, const uint32_t imageColumnsNum, const uint32_t pixelChannelsNum, const exr2::consta::lineOrder::ctype lineOrderValue)
+		PixelData(const std::vector<ui8>& filebytes, const uint32_t pixeldataFirstByteIndex, const uint32_t imageRowsNum, const uint32_t imageColumnsNum, const uint32_t pixelChannelsNum, const exr2::consta::lineOrder::ctype lineOrderValue)
 		{
 			//tryValidateChannelValueType<channelCType32>();
 			// from .exr, read each scanline, providing (currentScanlineFirstByteIndex) which starts from (pixeldataFirstByteIndex) value and steps (+ scanline.byteSize()),

@@ -80,6 +80,12 @@ namespace utils
 
 	// static functions
 
+	static void waitForUser()
+	{
+		printf("Press \'Enter\' to continue...    ");
+		std::cin.get();
+	}
+
 	static std::string tabs(const uint32_t tabsNum)
 	{
 		std::string tabs = "";
@@ -204,7 +210,7 @@ namespace utils
 		/// </summary>
 		/// <param name="filename"> - name, relative path or absolute path of the target file </param>
 		/// <returns> Vector of bytes retrieved from file in binary mode </returns>
-		static std::vector<u8> getFilebytes_v4_isCcompatible(const char* filename)
+		static std::vector<ui8> getFilebytes_v4_isCcompatible(const char* filename)
 		{
 			unsigned int filesizeB = fileSizeBytes(filename);
 			std::ifstream file(filename, std::fstream::in | std::ifstream::binary);
@@ -216,7 +222,7 @@ namespace utils
 
 			// read file
 			const unsigned int filebytesNum = 674;
-			u8 filebytes[filebytesNum] = {0};
+			ui8 filebytes[filebytesNum] = {0};
 			char byte;
 			for (unsigned int i = 0; i < filesizeB; i++)
 			{
@@ -231,7 +237,7 @@ namespace utils
 				filebytes[i] = byte & 0xFF;
 			}
 			file.close();
-			std::vector<u8> filebytesVec(filebytes, filebytes+filebytesNum); // array to vector
+			std::vector<ui8> filebytesVec(filebytes, filebytes+filebytesNum); // array to vector
 			if (filebytesVec.size() != filesizeB)
 			{
 				throw std::runtime_error("Number of bytes read is different than file size in bytes. Reading may lost bytes or saved extra (false) bytes.");
@@ -247,7 +253,7 @@ namespace utils
 		/// </summary>
 		/// <param name="filename">  - name, relative path or absolute path of the target file  </param>
 		/// <returns> Vector of bytes retrieved from file in binary mode </returns>
-		static std::vector<u8> getFilebytes_v5_CppOnly(const char* filename)
+		static std::vector<ui8> getFilebytes_v5_CppOnly(const char* filename)
 		{
 			//if (filename.empty())
 			//{
@@ -258,9 +264,9 @@ namespace utils
 			std::ifstream file(filename, std::fstream::in | std::ifstream::binary);
 			if (!file)
 			{
-				throw std::runtime_error("Error opening file! Check the file is in the same directory with .exe / VS-project used.");
+				throw std::runtime_error("Error opening file " + std::string(filename) + ". Check the file is in the same directory with .exe");
 			}
-			std::vector<u8> filebytesVec(std::istreambuf_iterator<char>(file), {});		// read file (copy all data into "filebytes")
+			std::vector<ui8> filebytesVec(std::istreambuf_iterator<char>(file), {});		// read file (copy all data into "filebytes")
 			file.close();
 			if (filebytesVec.size() != filesizeB)
 			{
@@ -272,7 +278,7 @@ namespace utils
 
 	namespace print
 	{
-		static void asTable(const u8* arr, const unsigned int arrLen, const unsigned int columns = 16, const std::string elemPrintfFormat = "%u", const std::string elemSeparator = " ", const std::string rowSeparator = "\n")
+		static void asTable(const ui8* arr, const unsigned int arrLen, const unsigned int columns = 16, const std::string elemPrintfFormat = "%u", const std::string elemSeparator = " ", const std::string rowSeparator = "\n")
 		{
 			// const unsigned int arrLen = sizeof(arr);
 			if (columns < 1 or arrLen < columns)
@@ -299,20 +305,20 @@ namespace utils
 			}
 		}
 
-		static void asChars(const u8* bytes, const unsigned int bytesNum)
+		static void asChars(const ui8* bytes, const unsigned int bytesNum)
 		{
 			{
-				u8 test = bytes[bytesNum]; // try read last element
+				ui8 test = bytes[bytesNum]; // try read last element
 			}
 			std::cout.write((char*)bytes, bytesNum);
 		}
 
-		static void asBytes(const u8* bytes, const unsigned int bytesNum)
+		static void asBytes(const ui8* bytes, const unsigned int bytesNum)
 		{
 			asTable(bytes, bytesNum, 16, "%2.2X");
 		}
 
-		static void asCharUint8Byte(const u8* bytes, const unsigned int bytesNum)
+		static void asCharUint8Byte(const ui8* bytes, const unsigned int bytesNum)
 		{
 			for (unsigned int i = 0; i < bytesNum; i++)
 			{
@@ -320,7 +326,7 @@ namespace utils
 			}
 		}
 
-		static void asChar(const std::vector<u8>& bytes, bool VIEW_TABLE=true)
+		static void asChar(const std::vector<ui8>& bytes, bool VIEW_TABLE=true)
 		{
 			if (VIEW_TABLE)
 			{
@@ -340,11 +346,11 @@ namespace utils
 			}
 			else
 			{
-				utils::printVector<u8>(bytes, false, "");
+				utils::printVector<ui8>(bytes, false, "");
 			}
 		}
 
-		static void asBytes(const std::vector<u8>& bytes)
+		static void asBytes(const std::vector<ui8>& bytes)
 		{
 			printf("___________ +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +a +b +c +d +e +f \n");
 			for(unsigned int i = 0; i < bytes.size(); i++)
@@ -361,7 +367,7 @@ namespace utils
 			}
 		}
 
-		static void asCharUint8Byte(const std::vector<u8>& bytes)
+		static void asCharUint8Byte(const std::vector<ui8>& bytes)
 		{
 			for(unsigned int i = 0; i < bytes.size(); i++)
 			{
