@@ -1,0 +1,77 @@
+# ===============================
+# CMake build artifacts
+# ===============================
+bin/
+build/
+out/
+cmake_install.cmake
+compile_commands.json 	# compiler info for tooling
+CMakeCache.txt
+CMakeFiles 				# intermediate build files
+CMakeLists.txt.user 	# local IDE settings
+CMakeScripts 			# internal scripts
+CMakeSettings.json		# Visual Studio-only file for local config
+CMakeUserPresets.json 	# local user CMake settings
+CTestTestfile.cmake 	# test definitions
+Makefile
+Testing
+
+# ===============================
+# General
+# ===============================
+_deps 					# cached 3rd-party dependencies
+*.log
+*.DS_Store
+install_manifest.txt 	# installed file list
+
+# ===============================
+# IDE: Visual Studio
+# ===============================
+.vs/
+*.ipch/
+*.exe
+*.filters
+*.idb
+*.obj
+*.pdb
+*.sln
+*.vcxproj
+*.vcxproj.*
+*.user
+
+# ===============================
+# IDE: Visual Studio Code
+# ===============================
+.vscode/
+
+# ===============================
+# IDE: CLion / JetBrains IDEs
+# ===============================
+.idea/
+cmake-build-*/
+*.iml
+
+# ===============================
+# IDE: Xcode
+# ===============================
+*.xcodeproj/
+*.xcuserdata/
+*.xcworkspace/
+*.xcuserstate
+
+# ===============================
+# IDE: Eclipse CDT
+# ===============================
+.settings/
+.cproject
+.project
+
+# ===============================
+# Code::Blocks
+# ===============================
+obj/ 			# Default build output folder (optional, adjust if custom path)
+*.autosave
+*.cbp 			# Code::Blocks project file
+*.depend 		# Dependency files
+*.layout 		# Workspace layout info
+*.layout.save

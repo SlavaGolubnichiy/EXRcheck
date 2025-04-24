@@ -10,7 +10,7 @@
 class VersionField
 {
 	public:
-	VersionField(const std::vector<u8>& filebytes)
+	VersionField(const std::vector<ui8>& filebytes)
 	{
 		std::vector<uint8_t> exr_versionFieldBytes = utils::slice((std::vector<uint8_t>)filebytes, vfFirstByteIndex, vfLastByteIndex);	// versionField: filebytes [04~07]
 		std::memcpy(&versionfield, exr_versionFieldBytes.data(), exr_versionFieldBytes.size());

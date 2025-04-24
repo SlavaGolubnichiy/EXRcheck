@@ -59,9 +59,9 @@ namespace exrTypes
 		return value;
 	}
 
-	static std::string readCString(const std::vector<u8>::const_iterator strFirst, const std::vector<u8>::const_iterator cend)
+	static std::string readCString(const std::vector<ui8>::const_iterator strFirst, const std::vector<ui8>::const_iterator cend)
 	{
-		std::vector<u8>::const_iterator strEnd = std::find(strFirst, cend, '\0');
+		std::vector<ui8>::const_iterator strEnd = std::find(strFirst, cend, '\0');
 		if (strEnd == cend)
 		{
 			throw std::runtime_error("\'\0\' (c-string null-terminator) not found");
@@ -112,7 +112,7 @@ namespace exrTypes
 		int32_t samplingX = 0;
 		int32_t samplingY = 0;
 
-		Channel(const std::vector<u8>& filebytes, const uint32_t channelFirstByteIndex, const bool versionFieldBit10)
+		Channel(const std::vector<ui8>& filebytes, const uint32_t channelFirstByteIndex, const bool versionFieldBit10)
 			: channel_firstByteIndex(channelFirstByteIndex)
 		{
 			// find "channels\0chlist\0" byte-substring in filebytes and analyse the following bytes
@@ -120,7 +120,7 @@ namespace exrTypes
 			channel_lastByteIndex = lastByteIndex();
 		}
 
-		void analyseChannel(const std::vector<u8>& bytes, const uint32_t channelFirstByteIndex)
+		void analyseChannel(const std::vector<ui8>& bytes, const uint32_t channelFirstByteIndex)
 		{
 			// chlist channel name
 			name_firstByteIndex = channelFirstByteIndex;
@@ -325,7 +325,7 @@ namespace exrTypes
 		/// </summary>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="chlistFirstByteIndex"> - index of first byte of chlist value within "filebytes" vector of input .exr file bytes </param>
-		Chlist(const std::vector<u8> filebytes, const uint32_t chlistFirstByteIndex, const bool versionFieldBit10)
+		Chlist(const std::vector<ui8> filebytes, const uint32_t chlistFirstByteIndex, const bool versionFieldBit10)
 			: exrTypeBase(chlistFirstByteIndex, sizeInBytes())
 		{
 			// tryValidateSizeIs();		// chlist size does not have predefined const value
@@ -416,7 +416,7 @@ namespace exrTypes
 		/// </summary>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="compressionFirstByteIndex"> - index of first byte of compression value within "filebytes" vector of input .exr file bytes </param>
-		Compression(const std::vector<u8> filebytes, const uint32_t compressionFirstByteIndex)
+		Compression(const std::vector<ui8> filebytes, const uint32_t compressionFirstByteIndex)
 			: exrTypeBase(compressionFirstByteIndex, sizeInBytes())
 		{
 			// check if type of stored value and sizeInBytes() are implemented correctly
@@ -478,7 +478,7 @@ namespace exrTypes
 		/// </summary>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="box2iFirstByteIndex"> - index of first byte of box2i value within "filebytes" vector of input .exr file bytes </param>
-		Box2i(const std::vector<u8>& filebytes, const uint32_t box2iFirstByteIndex)
+		Box2i(const std::vector<ui8>& filebytes, const uint32_t box2iFirstByteIndex)
 			: exrTypeBase(box2iFirstByteIndex, sizeInBytes())
 		{
 			tryValidateSizeIs(exr::consta::TypeValueSizeBytes::box2i);
@@ -568,7 +568,7 @@ namespace exrTypes
 		/// </summary>
 		/// <param name="filebytes"> vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="box2iFirstByteIndex"> index of first byte of box2i value within "filebytes" vector of input .exr file bytes </param>
-		LineOrder(const std::vector<u8>& filebytes, const uint32_t lineOrderFirstByteIndex)
+		LineOrder(const std::vector<ui8>& filebytes, const uint32_t lineOrderFirstByteIndex)
 			:
 			exrTypeBase(lineOrderFirstByteIndex, sizeInBytes()),
 			u_lineOrder(filebytes[lineOrderFirstByteIndex])
@@ -627,7 +627,7 @@ namespace exrTypes
 		/// </summary>
 		/// <param name="filebytes"> vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="box2iFirstByteIndex"> index of first byte of box2i value within "filebytes" vector of input .exr file bytes </param>
-		Float32(const std::vector<u8>& filebytes, const uint32_t floatFirstByteIndex)
+		Float32(const std::vector<ui8>& filebytes, const uint32_t floatFirstByteIndex)
 			: exrTypeBase(floatFirstByteIndex, sizeInBytes())
 		{
 			tryValidateSizeIs(exr::consta::TypeValueSizeBytes::float32);
@@ -681,7 +681,7 @@ namespace exrTypes
 		/// </summary>
 		/// <param name="filebytes"> vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="box2iFirstByteIndex"> index of first byte of box2i value within "filebytes" vector of input .exr file bytes </param>
-		V2f(const std::vector<u8>& filebytes, const uint32_t v2fFirstByteIndex)
+		V2f(const std::vector<ui8>& filebytes, const uint32_t v2fFirstByteIndex)
 			: exrTypeBase(v2fFirstByteIndex, sizeInBytes())
 		{
 			tryValidateSizeIs(exr::consta::TypeValueSizeBytes::v2f);
@@ -809,13 +809,13 @@ namespace exrTypes
 		/// <param name="attribNameToAnalyse"> - name of the attribute to search for ana analyse </param>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="versionFieldBit10"> - bit 10 of Version Field of input .exr file </param>
-		AttribBase(const std::string& attribNameToAnalyse, const std::vector<u8>& filebytes, const bool versionFieldBit10)
+		AttribBase(const std::string& attribNameToAnalyse, const std::vector<ui8>& filebytes, const bool versionFieldBit10)
 		{
 			// from filebytes, unpack common attrib parts: name, value type, value size in bytes
 			// read nameToAnalyse
 			u_name = attribNameToAnalyse;
-			std::vector<u8> nameVec(u_name.cbegin(), u_name.cend());
-			std::vector<u8>::const_iterator attribNameBegin = std::search(filebytes.cbegin(), filebytes.cend(), nameVec.cbegin(), nameVec.cend());
+			std::vector<ui8> nameVec(u_name.cbegin(), u_name.cend());
+			std::vector<ui8>::const_iterator attribNameBegin = std::search(filebytes.cbegin(), filebytes.cend(), nameVec.cbegin(), nameVec.cend());
 			if (attribNameBegin == filebytes.cend())
 			{
 				throw std::runtime_error("attribute (attribute name) not found");
@@ -884,7 +884,7 @@ namespace exrTypes
 		/// <param name="attribName"> - name of the attribute to search for ana analyse </param>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="versionFieldBit10"> - bit 10 of Version Field of input .exr file </param>
-		AttribChlist(const std::string& attribName, const std::vector<u8>& filebytes, const bool versionFieldBit10)
+		AttribChlist(const std::string& attribName, const std::vector<ui8>& filebytes, const bool versionFieldBit10)
 			: 
 			AttribBase(attribName, filebytes, versionFieldBit10),
 			// set attrib value from filebytes using attribValue_FirstByteIndex from base class, set base.attribValue_LastByteIndex
@@ -928,7 +928,7 @@ namespace exrTypes
 		/// <param name="attribName"> - name of the attribute to search for ana analyse </param>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="versionFieldBit10"> - bit 10 of Version Field of input .exr file </param>
-		AttribCompression(const std::string& attribName, const std::vector<u8>& filebytes, const bool versionFieldBit10)
+		AttribCompression(const std::string& attribName, const std::vector<ui8>& filebytes, const bool versionFieldBit10)
 			: 
 			AttribBase(attribName, filebytes, versionFieldBit10),
 			// set attrib value from filebytes using attribValue_FirstByteIndex from base class, set base.attribValue_LastByteIndex
@@ -968,7 +968,7 @@ namespace exrTypes
 		/// <param name="attribName"> - name of the attribute to search for ana analyse </param>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="versionFieldBit10"> - bit 10 of Version Field of input .exr file </param>
-		AttribBox2i(const std::string& attribName, const std::vector<u8>& filebytes, const bool versionFieldBit10)
+		AttribBox2i(const std::string& attribName, const std::vector<ui8>& filebytes, const bool versionFieldBit10)
 			: 
 			AttribBase(attribName, filebytes, versionFieldBit10),
 			// set attrib value from filebytes using attribValue_FirstByteIndex from base class, set base.attribValue_LastByteIndex
@@ -1009,7 +1009,7 @@ namespace exrTypes
 		/// <param name="attribName"> - name of the attribute to search for ana analyse </param>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="versionFieldBit10"> - bit 10 of Version Field of input .exr file </param>
-		AttribLineorder(const std::string& attribName, const std::vector<u8>& filebytes, const bool versionFieldBit10)
+		AttribLineorder(const std::string& attribName, const std::vector<ui8>& filebytes, const bool versionFieldBit10)
 			: 
 			AttribBase(attribName, filebytes, versionFieldBit10),
 			u_lineOrder(LineOrder(filebytes, value_firstByteIndex()))
@@ -1051,7 +1051,7 @@ namespace exrTypes
 		/// <param name="attribName"> - name of the attribute to search for ana analyse </param>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="versionFieldBit10"> - bit 10 of Version Field of input .exr file </param>
-		AttribFloat32(const std::string& attribName, const std::vector<u8>& filebytes, const bool versionFieldBit10)
+		AttribFloat32(const std::string& attribName, const std::vector<ui8>& filebytes, const bool versionFieldBit10)
 			: 
 			AttribBase(attribName, filebytes, versionFieldBit10),
 			u_float32(Float32(filebytes, value_firstByteIndex()))
@@ -1090,7 +1090,7 @@ namespace exrTypes
 		/// <param name="attribName"> - name of the attribute to search for ana analyse </param>
 		/// <param name="filebytes"> - vector of bytes (uin8_t / unsigned char) of full input .exr file </param>
 		/// <param name="versionFieldBit10"> - bit 10 of Version Field of input .exr file </param>
-		AttribV2f(const std::string& attribName, const std::vector<u8>& filebytes, const bool versionFieldBit10)
+		AttribV2f(const std::string& attribName, const std::vector<ui8>& filebytes, const bool versionFieldBit10)
 			: 
 			AttribBase(attribName, filebytes, versionFieldBit10),
 			u_v2f(V2f(filebytes, value_firstByteIndex()))
@@ -1149,7 +1149,7 @@ namespace exrTypes
 		/// <param name="dataWindowYMax"></param>
 		/// <param name="versionFieldBit12_isMultipart"></param>
 		/// <param name="doesExrHas_chunkCount_Attribute"></param>
-		OffsetTable(const std::vector<u8>& filebytes, const uint32_t offsetTableFirstByteIndex, const uint32_t dataWindowYMax, const bool versionFieldBit12_isMultipart = 0, const bool doesExrHas_chunkCount_Attribute = 0)
+		OffsetTable(const std::vector<ui8>& filebytes, const uint32_t offsetTableFirstByteIndex, const uint32_t dataWindowYMax, const bool versionFieldBit12_isMultipart = 0, const bool doesExrHas_chunkCount_Attribute = 0)
 		{
 			/// ReadMe!
 			// I didnt find explanation on how to calculate number or size of offsetTable 

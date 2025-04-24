@@ -18,6 +18,15 @@
 /// see the _docs/doc_OpenEXR.txt
 /// see the _docs/doc_todo.txt
 
+// naming convention
+// m_name = non-static private member
+// s_name = static variable
+// g_name = gloabal variable
+// ??? ------v 
+// c_name = constant
+// s_name = struct
+// t_name = template argument
+
 // Visual Studio: _DEBUG	= 1 when Config= Release, = 0 when Config= Debug.
 #include <algorithm>
 #include <cstring>
@@ -115,7 +124,7 @@ bool isValidUnsignedInteger(const std::string& str, uint32_t& result)
 /// </summary>
 /// <param name="filename"> Vector of bytes retrieved from file </param>
 /// <returns> void </returns>
-void exrAnalysisDetailed(const std::vector<u8>& filebytes, const bool hasAttribute_xDensity = false)
+void exrAnalysisDetailed(const std::vector<ui8>& filebytes, const bool hasAttribute_xDensity = false)
 {
 	printf("-------- Magic number & Version field -------- \n");
 	/// OpenEXR magicNumber (.exr file validator)
@@ -293,11 +302,9 @@ int main(int argc, char* argv[])	// argc = , argv = program .exe path
 		return 0;
 	}
 	#else
-	std::string imagesDir = "images";
-	std::string testDir = "test";
 	//std::string filename = "RgbaF32CodecNo-nonColor_DeviceSRGB-ViewAGX-SqncrSRGB.exr";	// exr colorspace = nonColor 	// Device = sRGB
 	std::string filename = "RgbaF32CodecNo-sRGB_DeviceSRGB-ViewAGX-SqncrSRGB.exr";			// exr colorspace = sRGB 		// Device = sRGB
-	fs::path filepath = fs::path(imagesDir) / fs::path(testDir) / fs::path(filename);
+	fs::path filepath = fs::path("assets") / fs::path("images") / fs::path("test") / fs::path(filename);
 	#endif
 
 	/// Ask user about required floating-point numbers precision showed (unfinished)
@@ -350,7 +357,7 @@ int main(int argc, char* argv[])	// argc = , argv = program .exe path
 
 
 	printf("file: %s\n\n", filepath.generic_string().c_str());
-	std::vector<u8> filebytes = utils::file::getFilebytes_v5_CppOnly(filepath.string().c_str());
+	std::vector<ui8> filebytes = utils::file::getFilebytes_v5_CppOnly(filepath.string().c_str());
 	printf("EXR data (char view) -------------------------------------- \n");
 	utils::print::asChar(filebytes);
 	printf("\nEOF ------------------------------------------------------- \n\n");
