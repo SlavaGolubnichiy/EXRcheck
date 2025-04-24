@@ -49,7 +49,7 @@ namespace exr2
 {
 	namespace consta
 	{
-		const uint32_t c_magicNumber = 0x01312F76;
+		const uint32_t c_magicNumber = 0x01312F76; const uint32_t c_magicNumber_firstByteIndex = 0, c_magicNumber_lastByteIndex = 3;
 		const uint8_t c_versionNumber = 0x02;
 
 		/* document tag [VERSIONFIELD-02] */

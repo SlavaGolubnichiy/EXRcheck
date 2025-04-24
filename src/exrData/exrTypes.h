@@ -1251,6 +1251,15 @@ namespace exrTypes
 				": [0x" + utils::hex(entry.firstByteIndex(),4) + " ~ 0x" + utils::hex(entry.lastByteIndex(),4) + 
 				"] offset= " + std::to_string(entry.value()) + " = 0x" + utils::hex64(entry.value());
 		}
+		std::string toStringAllEntries(const uint8_t tabsNum = 0, const std::string delim = "\n") const
+		{
+			std::string result = "";
+			for (uint32_t i = 0; i < length(); i++)
+			{
+				result += utils::tabs(tabsNum) + toString(i) + delim;
+			}
+			return result;
+		}
 
 		private:
 		std::vector<utils::IndexedValue<uint64_t>> m_offsetTable;

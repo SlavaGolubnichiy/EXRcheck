@@ -6,7 +6,7 @@
 
 namespace exr
 {
-	static int32_t c_magicNumber(const std::vector<ui8>& filebytes)
+	static int32_t magicNumber(const std::vector<ui8>& filebytes)
 	{
 		if (filebytes.size() < 4)
 		{
@@ -47,4 +47,5 @@ namespace exr
 		*/
 		return exr_magicNum;
 	}
+
 }

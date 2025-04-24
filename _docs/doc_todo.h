@@ -44,7 +44,7 @@
 //			to locate missed an unread attributes.
 //	[  ] 6c. (maybe) for OpenEXR attributes, improve algorithm by reading through .exr byte-by-byte and search for null-terminated strings (attributes names), then
 //			pass found attributes names strings into AttribX constructor to try reading the attribute assumed to have the name found earlier.
-//
+// [  ] 7. Implement input .exr file reader as a singleton class.
 // 
 // 
 // 

@@ -10,6 +10,16 @@
 #include "types.h"
 #include "TemplateConcepts.h"
 
+#define printCaughtException(x) \
+try								\
+{								\
+	x							\
+}								\
+catch(const std::exception& e)	\
+{								\
+	printf("%s", e.what());		\
+}
+
 namespace utils
 {
 	// classes
