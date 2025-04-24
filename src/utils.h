@@ -21,7 +21,7 @@ namespace utils
 		public:
 		Range() {}
 		Range(const NumberT first, const NumberT last)
-			: u_first(first), u_last(last)
+			: m_first(first), m_last(last)
 		{
 			/*
 				// Add step parameter ?
@@ -30,21 +30,21 @@ namespace utils
 				if ((step == 0) && !(first == last)) throw std::invalid_argument("if (step) = 0 then must be (last) = (first). Something is not valid.");
 			*/
 		}
-		Range(const Range& other) : u_first(other.u_first), u_last(other.u_last) {}
+		Range(const Range& other) : m_first(other.m_first), m_last(other.m_last) {}
 		Range& operator=(const Range& other)
 		{
 			if (this != &other)		// protect against self-initialization
 			{
-				u_first = other.u_first;
-				u_last = other.u_last;
+				m_first = other.m_first;
+				m_last = other.m_last;
 			}
 			return *this;
 		}
-		NumberT first() const { return u_first; }
-		NumberT last() const { return u_last; }
+		NumberT first() const { return m_first; }
+		NumberT last() const { return m_last; }
 
 		private:
-		NumberT u_first = 0, u_last = 0;
+		NumberT m_first = 0, m_last = 0;
 
 	};
 
@@ -53,29 +53,29 @@ namespace utils
 	{
 		public:
 		IndexedValue(const uint32_t valueFirstByteIndex, const uint32_t valueLastByteIndex, ValueType value)
-			: u_valueByteRange(utils::Range<uint32_t>(valueFirstByteIndex, valueLastByteIndex)), u_value(value)
+			: m_valueByteRange(utils::Range<uint32_t>(valueFirstByteIndex, valueLastByteIndex)), m_value(value)
 		{
 		}
 		IndexedValue(const IndexedValue<ValueType>& other)
-			: u_valueByteRange(other.u_valueByteRange), u_value(other.u_value)
+			: m_valueByteRange(other.m_valueByteRange), m_value(other.m_value)
 		{
 		}
 		IndexedValue& operator=(const IndexedValue& other)
 		{
 			if (this != &other)
 			{
-				u_valueByteRange = other.u_valueByteRange;
-				u_value = other.u_value;
+				m_valueByteRange = other.m_valueByteRange;
+				m_value = other.m_value;
 			}
 			return *this;
 		}
-		ValueType value() const { return u_value; }
-		uint32_t firstByteIndex() const { return u_valueByteRange.first(); }
-		uint32_t lastByteIndex() const { return u_valueByteRange.last(); }
+		ValueType value() const { return m_value; }
+		uint32_t firstByteIndex() const { return m_valueByteRange.first(); }
+		uint32_t lastByteIndex() const { return m_valueByteRange.last(); }
 
 		private:
-		ValueType u_value;
-		utils::Range<uint32_t> u_valueByteRange;
+		ValueType m_value;
+		utils::Range<uint32_t> m_valueByteRange;
 	};
 
 	// static functions

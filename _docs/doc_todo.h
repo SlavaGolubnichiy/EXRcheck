@@ -37,6 +37,16 @@
 ///		[OK] 5f.5. Refactor code, improve naming, reduce redundancy.
 ///		[OK] 5f.6. Test the results and debug if needed.
 ///		[OK] 5f.7. Check if .exr file stores & pixelData retrieves correct pixel channels values.
+// [  ] 6. Improve reading of OpenEXR attributes.
+//	[  ] 6a. OpenEXR attributes: implement ExrHeaderReader class, which reads OpenEXr file header attributes and stores them, allows accessing OpenEXR standard required
+//			header attributes, allows accessing optional attributes (analyzed and found inside .exr file)
+//	[  ] 6b. OpenEXR attributes: implement check of attributes' firstByteIndex() and lastByteIndex() -es to search for byte gaps left after analysis 
+//			to locate missed an unread attributes.
+//	[  ] 6c. (maybe) for OpenEXR attributes, improve algorithm by reading through .exr byte-by-byte and search for null-terminated strings (attributes names), then
+//			pass found attributes names strings into AttribX constructor to try reading the attribute assumed to have the name found earlier.
+//
+// 
+// 
 // 
 // Refactor:
 ///	[OK] 0.1 organize related functionality and data into exr MagicNumber class.
@@ -47,6 +57,7 @@
 //			and not repeat the same code of creating string of "[" + hex(rangeMin) + "; " + hex(rangeMax) + "] " + info; or smth like this.
 //	[  ] 0.5 Put .exr file magicNumber-, versionField-, attribute, etc...-reading code into exrAnalyzer class.
 //  
+// 
 // Docs:
 //	[  ] 1. Docs: complete doc-comment about tiled, etc... exr files at marker EXRTILED-1 from https://openexr.com/en/latest/OpenEXRFileLayout.html#header-attributes-all-files
 //	[  ] 2. Docs: complete doc-comment about Chlist attrib. type structure at marker CHLIST-1

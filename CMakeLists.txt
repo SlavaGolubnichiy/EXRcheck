@@ -25,7 +25,6 @@ include_directories(${CMAKE_SOURCE_DIR}/src)	# CMAKE_SOURCE_DIR is the directory
 # Specify target executable
 add_executable(${appName}
 	"src/Application.cpp"	# also possible: "src/*.cpp"
-	"src/ExeParams.h"
 )
 
 

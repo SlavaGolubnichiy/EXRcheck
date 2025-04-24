@@ -59,8 +59,8 @@ namespace exrPixeldata
 	// test end
 	
 	/// Scanline reading classes
-	static inline const std::invalid_argument invalidPixelRowIndex = std::invalid_argument("(pixelRowIndex) value is out of valid range [0; numberOfScanlines-1] (note: numberOfScanlines equals to number of image rows)");
-	static inline const std::invalid_argument invalidPixelColumnIndex = std::invalid_argument("(pixelColumnIndex) value is out of valid range [0; numberOfPixelsInScanline-1] (note: numberOfPixelsInScanline equals to number of image columns)");
+	static inline const std::invalid_argument s_c_invalidPixelRowIndex = std::invalid_argument("(pixelRowIndex) value is out of valid range [0; numberOfScanlines-1] (note: numberOfScanlines equals to number of image rows)");
+	static inline const std::invalid_argument s_c_invalidPixelColumnIndex = std::invalid_argument("(pixelColumnIndex) value is out of valid range [0; numberOfPixelsInScanline-1] (note: numberOfPixelsInScanline equals to number of image columns)");
 	
 	// template type constraint do disallow data types that will cause error
 	template<typename T>
@@ -90,7 +90,7 @@ namespace exrPixeldata
 	{
 		public:
 		Channel_i_ofPixel(const std::vector<ui8>& filebytes, const uint32_t valueFirstByteIndex)
-			: u_channelAndByteRange(utils::IndexedValue<channelCType32>(0,0,0))
+			: m_channelAndByteRange(utils::IndexedValue<channelCType32>(0,0,0))
 		{
 			//tryValidateChannelValueType<channelCType32>();
 			uint32_t valueLastByteIndex = valueFirstByteIndex + sizeof(channelCType32)-1;
@@ -104,10 +104,10 @@ namespace exrPixeldata
 			{
 				value = exrTypes::readFloat32((filebytes.begin()+valueFirstByteIndex)._Ptr);
 			}
-			u_channelAndByteRange = utils::IndexedValue(valueFirstByteIndex, valueLastByteIndex, value);
+			m_channelAndByteRange = utils::IndexedValue(valueFirstByteIndex, valueLastByteIndex, value);
 		}
 		Channel_i_ofPixel(const Channel_i_ofPixel<channelCType32>& other)
-			: u_channelAndByteRange(other.u_channelAndByteRange)
+			: m_channelAndByteRange(other.m_channelAndByteRange)
 		{
 			//tryValidateChannelValueType<channelCType32>();
 		}
@@ -115,13 +115,13 @@ namespace exrPixeldata
 		{
 			if (this != &other)
 			{
-				u_channelAndByteRange = other.u_channelAndByteRange;
+				m_channelAndByteRange = other.m_channelAndByteRange;
 			}
 			return *this;
 		}
-		channelCType32 value() const { return u_channelAndByteRange.value(); }
-		uint32_t firstByteIndex() const { return u_channelAndByteRange.firstByteIndex(); }
-		uint32_t lastByteIndex() const { return u_channelAndByteRange.lastByteIndex(); }
+		channelCType32 value() const { return m_channelAndByteRange.value(); }
+		uint32_t firstByteIndex() const { return m_channelAndByteRange.firstByteIndex(); }
+		uint32_t lastByteIndex() const { return m_channelAndByteRange.lastByteIndex(); }
 		std::string toString(const uint8_t tabsNum = 0, const bool includeByteIndexes = false) const
 		{
 			if (!includeByteIndexes)
@@ -131,7 +131,7 @@ namespace exrPixeldata
 		}
 	
 		private:
-		utils::IndexedValue<channelCType32> u_channelAndByteRange;
+		utils::IndexedValue<channelCType32> m_channelAndByteRange;
 	
 	};
 	
@@ -148,12 +148,12 @@ namespace exrPixeldata
 			for (uint32_t i = 0; i < scanlinePixelsNum; i++)
 			{
 				Channel_i_ofPixel<channelCType32> channelOfPixel_copy = Channel_i_ofPixel<channelCType32>(filebytes, currentByteIndex);
-				u_channel_i_ofScanlinePixels.push_back(channelOfPixel_copy);
+				m_channel_i_ofScanlinePixels.push_back(channelOfPixel_copy);
 				currentByteIndex += 4;	// because Channel_i_ofPixel requires channelCType4Bytes, not channelCType_?_Bytes
 			}
 		}
 		Channel_i_ofScanlinePixels(const Channel_i_ofScanlinePixels<channelCType32> &other)
-			: u_channel_i_ofScanlinePixels(other.u_channel_i_ofScanlinePixels)
+			: m_channel_i_ofScanlinePixels(other.m_channel_i_ofScanlinePixels)
 		{
 			//tryValidateChannelValueType<channelCType32>();
 		}
@@ -161,17 +161,17 @@ namespace exrPixeldata
 		{
 			if (pixelIndex < 0 or (scanlinePixelsNum()-1) < pixelIndex)
 			{
-				throw invalidPixelColumnIndex;
+				throw s_c_invalidPixelColumnIndex;
 			}
 		}
 		Channel_i_ofScanlinePixels<channelCType32>& operator=(const Channel_i_ofScanlinePixels<channelCType32>& other)
 		{
 			if (this != &other)
 			{
-				u_channel_i_ofScanlinePixels.clear();
-				for (const Channel_i_ofPixel<channelCType32> channel_i_ofScanline : other.u_channel_i_ofScanlinePixels)
+				m_channel_i_ofScanlinePixels.clear();
+				for (const Channel_i_ofPixel<channelCType32> channel_i_ofScanline : other.m_channel_i_ofScanlinePixels)
 				{
-					u_channel_i_ofScanlinePixels.push_back(channel_i_ofScanline);
+					m_channel_i_ofScanlinePixels.push_back(channel_i_ofScanline);
 				}
 			}
 			return *this;
@@ -179,19 +179,19 @@ namespace exrPixeldata
 		Channel_i_ofPixel<channelCType32> indexedChannelByPixelIndex(const uint32_t pixelIndex) const
 		{
 			tryValidatePixelColumnIndex(pixelIndex);
-			return u_channel_i_ofScanlinePixels[pixelIndex];
+			return m_channel_i_ofScanlinePixels[pixelIndex];
 		}
 		channelCType32 channelValueByPixelIndex(const uint32_t pixelIndex) const
 		{
 			tryValidatePixelColumnIndex(pixelIndex);
-			return u_channel_i_ofScanlinePixels[pixelIndex].value();
+			return m_channel_i_ofScanlinePixels[pixelIndex].value();
 		}
-		uint32_t firstByteIndex() const { return u_channel_i_ofScanlinePixels[0].firstByteIndex(); }	// first byte index of first scanline pixel channel_i entry
-		uint32_t lastByteIndex() const { return this->u_channel_i_ofScanlinePixels[scanlinePixelsNum()-1].lastByteIndex(); }	// last byte index of last scanline pixel channel_i entry
-		uint32_t scanlinePixelsNum() const { return this->u_channel_i_ofScanlinePixels.size(); }
+		uint32_t firstByteIndex() const { return m_channel_i_ofScanlinePixels[0].firstByteIndex(); }	// first byte index of first scanline pixel channel_i entry
+		uint32_t lastByteIndex() const { return this->m_channel_i_ofScanlinePixels[scanlinePixelsNum()-1].lastByteIndex(); }	// last byte index of last scanline pixel channel_i entry
+		uint32_t scanlinePixelsNum() const { return this->m_channel_i_ofScanlinePixels.size(); }
 	
 		private:
-		std::vector<Channel_i_ofPixel<channelCType32>> u_channel_i_ofScanlinePixels;
+		std::vector<Channel_i_ofPixel<channelCType32>> m_channel_i_ofScanlinePixels;
 	
 	};
 	
@@ -232,67 +232,55 @@ namespace exrPixeldata
 		RegularScanline(const std::vector<ui8>& filebytes, const uint32_t scanlineFirstByteIndex, const uint32_t scanlinePixelsNum, const uint32_t pixelChannelsNum)
 			:
 			// calculate scanline generic data filebytes-indexes
-			u_firstByteIndex(scanlineFirstByteIndex),
-			u_yFirstByteIndex(scanlineFirstByteIndex), u_yLastByteIndex(scanlineFirstByteIndex + sizeof(u_y) - 1)
+			m_firstByteIndex(scanlineFirstByteIndex),
+			m_yFirstByteIndex(scanlineFirstByteIndex), m_yLastByteIndex(scanlineFirstByteIndex + sizeof(m_y) - 1)
 		{
-			u_valueSizeFirstByteIndex = u_yLastByteIndex + 1;
-			u_valueSizeLastByteIndex = u_valueSizeFirstByteIndex + sizeof(u_valueSize) - 1;
+			m_valueSizeFirstByteIndex = m_yLastByteIndex + 1;
+			m_valueSizeLastByteIndex = m_valueSizeFirstByteIndex + sizeof(m_valueSize) - 1;
 			// validate template type
 			//tryValidateChannelValueType<channelCType32>();
 			// save scanline generic data
-			u_y = int32_t(exrTypes::readUint32((filebytes.begin()+u_yFirstByteIndex)._Ptr));					/// risk: converting this uint32->int32 when uint32 is greater than 0.5*2^32, may result in wrong number
-			uint32_t valueSize = exrTypes::readUint32((filebytes.begin()+u_valueSizeFirstByteIndex)._Ptr);
-			u_valueSize = int32_t(valueSize);	/// risk: converting this uint32->int32 when uint32 is greater than 0.5*2^32, may result in wrong number
+			m_y = int32_t(exrTypes::readUint32((filebytes.begin()+m_yFirstByteIndex)._Ptr));					/// risk: converting this uint32->int32 when uint32 is greater than 0.5*2^32, may result in wrong number
+			uint32_t valueSize = exrTypes::readUint32((filebytes.begin()+m_valueSizeFirstByteIndex)._Ptr);
+			m_valueSize = int32_t(valueSize);	/// risk: converting this uint32->int32 when uint32 is greater than 0.5*2^32, may result in wrong number
 			
 			// read scanline pixels' channel groups
-			uint32_t scanlineChannelsA_firstByteIndex = u_valueSizeLastByteIndex + 1;
-			//uint32_t currentByteIndex = scanlineChannelsA_firstByteIndex;
-			//for (uint32_t i = 0; i < pixelChannelsNum; i++)
-			//{
-			//	u_scanlineChannels[i] = Channel_i_ofScanlinePixels(filebytes, currentByteIndex, scanlinePixelsNum);
-			//	currentByteIndex += u_scanLineChannels[i].lastByteIndex() - 1;
-			//}
-			u_scanlineChannelsA = Channel_i_ofScanlinePixels<channelCType32>(filebytes, scanlineChannelsA_firstByteIndex, scanlinePixelsNum);
-			u_scanlineChannelsB = Channel_i_ofScanlinePixels<channelCType32>(filebytes, u_scanlineChannelsA.lastByteIndex()+1, scanlinePixelsNum);
-			u_scanlineChannelsG = Channel_i_ofScanlinePixels<channelCType32>(filebytes, u_scanlineChannelsB.lastByteIndex()+1, scanlinePixelsNum);
-			u_scanlineChannelsR = Channel_i_ofScanlinePixels<channelCType32>(filebytes, u_scanlineChannelsG.lastByteIndex()+1, scanlinePixelsNum);
-			u_lastByteIndex = u_scanlineChannelsR.lastByteIndex();
+			uint32_t scanlineChannelsA_firstByteIndex = m_valueSizeLastByteIndex + 1;
+			m_scanlineChannelsA = Channel_i_ofScanlinePixels<channelCType32>(filebytes, scanlineChannelsA_firstByteIndex, scanlinePixelsNum);
+			m_scanlineChannelsB = Channel_i_ofScanlinePixels<channelCType32>(filebytes, m_scanlineChannelsA.lastByteIndex()+1, scanlinePixelsNum);
+			m_scanlineChannelsG = Channel_i_ofScanlinePixels<channelCType32>(filebytes, m_scanlineChannelsB.lastByteIndex()+1, scanlinePixelsNum);
+			m_scanlineChannelsR = Channel_i_ofScanlinePixels<channelCType32>(filebytes, m_scanlineChannelsG.lastByteIndex()+1, scanlinePixelsNum);
+			m_lastByteIndex = m_scanlineChannelsR.lastByteIndex();
 		}
-		/*~Scanline_v2()
-		{
-			delete u_scanlineChannelsA; u_scanlineChannelsA = nullptr;
-			delete u_scanlineChannelsB; u_scanlineChannelsB = nullptr;
-			delete u_scanlineChannelsG; u_scanlineChannelsG = nullptr;
-			delete u_scanlineChannelsR; u_scanlineChannelsR = nullptr;
-		}*/
+
 		RegularScanline<channelCType32>& operator=(const RegularScanline<channelCType32>& other)
 		{
 			if (this != &other)
 			{
-				u_firstByteIndex = other.u_firstByteIndex;
-				u_lastByteIndex = other.u_lastByteIndex;
+				m_firstByteIndex = other.m_firstByteIndex;
+				m_lastByteIndex = other.m_lastByteIndex;
 	
-				u_y = other.u_y;
-				u_yFirstByteIndex = other.u_yFirstByteIndex;
-				u_yLastByteIndex = other.u_yLastByteIndex;
+				m_y = other.m_y;
+				m_yFirstByteIndex = other.m_yFirstByteIndex;
+				m_yLastByteIndex = other.m_yLastByteIndex;
 	
-				u_valueSize = other.u_valueSize;
-				u_valueSizeFirstByteIndex = other.u_valueSizeFirstByteIndex;
-				u_valueSizeLastByteIndex = other.u_valueSizeLastByteIndex;
+				m_valueSize = other.m_valueSize;
+				m_valueSizeFirstByteIndex = other.m_valueSizeFirstByteIndex;
+				m_valueSizeLastByteIndex = other.m_valueSizeLastByteIndex;
 	
-				u_scanlineChannelsA = other.u_scanlineChannelsA;
-				u_scanlineChannelsB = other.u_scanlineChannelsB;
-				u_scanlineChannelsG = other.u_scanlineChannelsG;
-				u_scanlineChannelsR = other.u_scanlineChannelsR;
+				m_scanlineChannelsA = other.m_scanlineChannelsA;
+				m_scanlineChannelsB = other.m_scanlineChannelsB;
+				m_scanlineChannelsG = other.m_scanlineChannelsG;
+				m_scanlineChannelsR = other.m_scanlineChannelsR;
 			}
 			return *this;
 		}
-		int32_t _y() const { return u_y; }
-		int32_t _valueSizeInBytes() const { return u_valueSize; }
-		channelCType32 a(const uint32_t pixelColumnIndex) const { u_scanlineChannelsA.tryValidatePixelColumnIndex(pixelColumnIndex); return u_scanlineChannelsA.channelValueByPixelIndex(pixelColumnIndex); }
-		channelCType32 b(const uint32_t pixelColumnIndex) const { u_scanlineChannelsB.tryValidatePixelColumnIndex(pixelColumnIndex); return u_scanlineChannelsB.channelValueByPixelIndex(pixelColumnIndex); }
-		channelCType32 g(const uint32_t pixelColumnIndex) const { u_scanlineChannelsG.tryValidatePixelColumnIndex(pixelColumnIndex); return u_scanlineChannelsG.channelValueByPixelIndex(pixelColumnIndex); }
-		channelCType32 r(const uint32_t pixelColumnIndex) const { u_scanlineChannelsR.tryValidatePixelColumnIndex(pixelColumnIndex); return u_scanlineChannelsR.channelValueByPixelIndex(pixelColumnIndex); }
+		int32_t _y() const { return m_y; }
+		int32_t _valueSizeInBytes() const { return m_valueSize; }
+		channelCType32 a(const uint32_t pixelColumnIndex) const { m_scanlineChannelsA.tryValidatePixelColumnIndex(pixelColumnIndex); return m_scanlineChannelsA.channelValueByPixelIndex(pixelColumnIndex); }
+		channelCType32 b(const uint32_t pixelColumnIndex) const { m_scanlineChannelsB.tryValidatePixelColumnIndex(pixelColumnIndex); return m_scanlineChannelsB.channelValueByPixelIndex(pixelColumnIndex); }
+		channelCType32 g(const uint32_t pixelColumnIndex) const { m_scanlineChannelsG.tryValidatePixelColumnIndex(pixelColumnIndex); return m_scanlineChannelsG.channelValueByPixelIndex(pixelColumnIndex); }
+		channelCType32 r(const uint32_t pixelColumnIndex) const { m_scanlineChannelsR.tryValidatePixelColumnIndex(pixelColumnIndex); return m_scanlineChannelsR.channelValueByPixelIndex(pixelColumnIndex); }
 		channelCType32 ABGRchannelByIndex(const uint32_t scanlinePixelIndex, const uint32_t pixelChannelIndex)
 		{
 			tryValidatePixelChannelIndex(pixelChannelIndex);
@@ -302,7 +290,7 @@ namespace exrPixeldata
 				case 1: return b(scanlinePixelIndex); break;
 				case 2: return g(scanlinePixelIndex); break;
 				case 3: return r(scanlinePixelIndex); break;
-				default: throw invalidChannelIndex;
+				default: throw s_c_invalidChannelIndex;
 			}
 		}
 		Channel_i_ofScanlinePixels<channelCType32> scanlineChannelsByChannelIndex(const uint32_t pixelChannelIndex) const
@@ -310,38 +298,38 @@ namespace exrPixeldata
 			tryValidatePixelChannelIndex(pixelChannelIndex);
 			switch(pixelChannelIndex)
 			{
-				case 0: return Channel_i_ofScanlinePixels<channelCType32>(u_scanlineChannelsA); break;
-				case 1: return Channel_i_ofScanlinePixels<channelCType32>(u_scanlineChannelsB); break;
-				case 2: return Channel_i_ofScanlinePixels<channelCType32>(u_scanlineChannelsG); break;
-				case 3: return Channel_i_ofScanlinePixels<channelCType32>(u_scanlineChannelsR); break;
-				default: throw invalidChannelIndex;
+				case 0: return Channel_i_ofScanlinePixels<channelCType32>(m_scanlineChannelsA); break;
+				case 1: return Channel_i_ofScanlinePixels<channelCType32>(m_scanlineChannelsB); break;
+				case 2: return Channel_i_ofScanlinePixels<channelCType32>(m_scanlineChannelsG); break;
+				case 3: return Channel_i_ofScanlinePixels<channelCType32>(m_scanlineChannelsR); break;
+				default: throw s_c_invalidChannelIndex;
 			}
 			
 		}
-		uint32_t firstByteIndex() const { return u_firstByteIndex; }
-		uint32_t lastByteIndex() const { return u_lastByteIndex; }
-		uint32_t yFirstByteIndex() const { return u_yFirstByteIndex; }
-		uint32_t yLastByteIndex() const { return u_yLastByteIndex; }
-		uint32_t valueSizeFirstByteIndex() const { return u_valueSizeFirstByteIndex; }
-		uint32_t valueSizeLastByteIndex() const { return u_valueSizeLastByteIndex; }
-		uint32_t sizeInBytes() const { return u_lastByteIndex - u_firstByteIndex + 1; }
-		uint32_t pixelsNum() const { return u_scanlineChannelsA.scanlinePixelsNum(); }	// all channels are of same scanline of pixels => their size is the same
+		uint32_t firstByteIndex() const { return m_firstByteIndex; }
+		uint32_t lastByteIndex() const { return m_lastByteIndex; }
+		uint32_t yFirstByteIndex() const { return m_yFirstByteIndex; }
+		uint32_t yLastByteIndex() const { return m_yLastByteIndex; }
+		uint32_t valueSizeFirstByteIndex() const { return m_valueSizeFirstByteIndex; }
+		uint32_t valueSizeLastByteIndex() const { return m_valueSizeLastByteIndex; }
+		uint32_t sizeInBytes() const { return m_lastByteIndex - m_firstByteIndex + 1; }
+		uint32_t pixelsNum() const { return m_scanlineChannelsA.scanlinePixelsNum(); }	// all channels are of same scanline of pixels => their size is the same
 		
 		private:
-		uint32_t u_firstByteIndex = 0, u_lastByteIndex = 0;
-		int32_t u_y = 0;			uint32_t u_yFirstByteIndex = 0, u_yLastByteIndex = 0;
-		int32_t u_valueSize = 0;	uint32_t u_valueSizeFirstByteIndex = 0, u_valueSizeLastByteIndex = 0;
-		Channel_i_ofScanlinePixels<channelCType32> u_scanlineChannelsA;	// already provides its .firstByteIndex() and .lastByteIndex()
-		Channel_i_ofScanlinePixels<channelCType32> u_scanlineChannelsB;
-		Channel_i_ofScanlinePixels<channelCType32> u_scanlineChannelsG;
-		Channel_i_ofScanlinePixels<channelCType32> u_scanlineChannelsR;
+		uint32_t m_firstByteIndex = 0, m_lastByteIndex = 0;
+		int32_t m_y = 0;			uint32_t m_yFirstByteIndex = 0, m_yLastByteIndex = 0;
+		int32_t m_valueSize = 0;	uint32_t m_valueSizeFirstByteIndex = 0, m_valueSizeLastByteIndex = 0;
+		Channel_i_ofScanlinePixels<channelCType32> m_scanlineChannelsA;	// already provides its .firstByteIndex() and .lastByteIndex()
+		Channel_i_ofScanlinePixels<channelCType32> m_scanlineChannelsB;
+		Channel_i_ofScanlinePixels<channelCType32> m_scanlineChannelsG;
+		Channel_i_ofScanlinePixels<channelCType32> m_scanlineChannelsR;
 		
-		static inline const std::invalid_argument invalidChannelIndex = std::invalid_argument("(pixelChannelIndex) value is out of valid range [0; Scanline_v2::pixelChannelsNum() - 1]");
+		static inline const std::invalid_argument s_c_invalidChannelIndex = std::invalid_argument("(pixelChannelIndex) value is out of valid range [0; Scanline_v2::pixelChannelsNum() - 1]");
 		void tryValidatePixelChannelIndex(const uint32_t pixelChannelIndex) const
 		{
 			if (pixelChannelIndex < 0 or (pixelChannelsNum() - 1) < pixelChannelIndex)
 			{
-				throw invalidChannelIndex;
+				throw s_c_invalidChannelIndex;
 			}
 		}
 	
@@ -352,7 +340,7 @@ namespace exrPixeldata
 	class PixelData
 	{
 		public:
-		PixelData(const std::vector<ui8>& filebytes, const uint32_t pixeldataFirstByteIndex, const uint32_t imageRowsNum, const uint32_t imageColumnsNum, const uint32_t pixelChannelsNum, const exr2::consta::lineOrder::ctype lineOrderValue)
+		PixelData(const std::vector<ui8>& filebytes, const uint32_t pixeldataFirstByteIndex, const uint32_t imageRowsNum, const uint32_t imageColumnsNum, const uint32_t pixelChannelsNum, const exr2::consta::s_lineOrder::ctype lineOrderValue)
 		{
 			//tryValidateChannelValueType<channelCType32>();
 			// from .exr, read each scanline, providing (currentScanlineFirstByteIndex) which starts from (pixeldataFirstByteIndex) value and steps (+ scanline.byteSize()),
@@ -361,25 +349,25 @@ namespace exrPixeldata
 			{
 				// read next scanline
 				RegularScanline<channelCType32> scanline_copy = RegularScanline<channelCType32>(filebytes, currentScanlineFirstByteIndex, imageColumnsNum, pixelChannelsNum);
-				u_scanlines.push_back(scanline_copy);
-				currentScanlineFirstByteIndex += u_scanlines[scanlineIndex].sizeInBytes();
+				m_scanlines.push_back(scanline_copy);
+				currentScanlineFirstByteIndex += m_scanlines[scanlineIndex].sizeInBytes();
 				// validate scanline.y(), scanline row index
 				//		if (lineOrder == INCREASING_Y)		=> u_y must be the same as (scanlineIndex) value,
 				//		else if (lineOrder == DECREASING_Y) => u_y must be the same as (imageRowsNumber-1 - scanlineIndex),
 				//		else if (lineOrder == RANDOM_Y)		=> u_y must be in range [0; imageRowsNumber-1].
 				//		else => lineOrder value is unknown.
-				int32_t scanlineY = u_scanlines[scanlineIndex]._y();
-				if (lineOrderValue == exr2::consta::lineOrder::value::INCREASING_Y)
+				int32_t scanlineY = m_scanlines[scanlineIndex]._y();
+				if (lineOrderValue == exr2::consta::s_lineOrder::value::INCREASING_Y)
 				{
 					if (scanlineY != scanlineIndex)
 						throw std::runtime_error("(y) row value of scanline from .exr is different from (rowIndex) or (scanlineIndex). Check .exr lineOrder value to know actual order in your .exr file.");
 				}
-				else if (lineOrderValue == exr2::consta::lineOrder::value::DECREASING_Y)
+				else if (lineOrderValue == exr2::consta::s_lineOrder::value::DECREASING_Y)
 				{
 					if (scanlineY != imageRowsNum-1-scanlineIndex)
 						throw std::runtime_error("(y) row value of scanline from .exr is different from (imageRows-1-rowIndex) or (imageRows-1-scanlineIndex). Check .exr lineOrder value to know actual order in your .exr file.");
 				}
-				else if (lineOrderValue == exr2::consta::lineOrder::value::RANDOM_Y)
+				else if (lineOrderValue == exr2::consta::s_lineOrder::value::RANDOM_Y)
 				{
 					if ((scanlineY < 0) or ((imageRowsNum-1) < scanlineY))
 						throw std::runtime_error("(y) row value of scanline from .exr is out of valid range [0; imageRowsNum-1]. Check .exr lineOrder value to know actual order in your .exr file.");
@@ -392,16 +380,16 @@ namespace exrPixeldata
 		{
 			if (this != &other)
 			{
-				u_scanlines.clear();
-				for (const RegularScanline<channelCType32> scanline : other.u_scanlines)
+				m_scanlines.clear();
+				for (const RegularScanline<channelCType32> scanline : other.m_scanlines)
 				{
-					u_scanlines.push_back(scanline);
+					m_scanlines.push_back(scanline);
 				}
 			}
 			return *this;
 		}
-		uint32_t firstByteIndex() const { return u_scanlines[0].firstByteIndex(); }						// firstByteIndex of first scanline
-		uint32_t lastByteIndex() const { return u_scanlines[u_scanlines.size()-1].lastByteIndex(); }	// lastByteIndex of last scanline
+		uint32_t firstByteIndex() const { return m_scanlines[0].firstByteIndex(); }						// firstByteIndex of first scanline
+		uint32_t lastByteIndex() const { return m_scanlines[m_scanlines.size()-1].lastByteIndex(); }	// lastByteIndex of last scanline
 
 		/// <summary>
 		/// 
@@ -421,10 +409,10 @@ namespace exrPixeldata
 		{
 			tryValidatePixelRowIndex(pixelRowIndex);
 			tryValidatePixelColumnIndex(pixelColumnIndex);
-			channelCType32 a = u_scanlines[pixelRowIndex].a(pixelColumnIndex);
-			channelCType32 b = u_scanlines[pixelRowIndex].b(pixelColumnIndex);
-			channelCType32 g = u_scanlines[pixelRowIndex].g(pixelColumnIndex);
-			channelCType32 r = u_scanlines[pixelRowIndex].r(pixelColumnIndex);
+			channelCType32 a = m_scanlines[pixelRowIndex].a(pixelColumnIndex);
+			channelCType32 b = m_scanlines[pixelRowIndex].b(pixelColumnIndex);
+			channelCType32 g = m_scanlines[pixelRowIndex].g(pixelColumnIndex);
+			channelCType32 r = m_scanlines[pixelRowIndex].r(pixelColumnIndex);
 			return {r, g, b, a};
 		}
 		std::string pixelRGBAString(const uint32_t pixelRowIndex, const uint32_t pixelColumnIndex, const bool hex = false, const uint8_t fltPrecis = 6) const
@@ -447,7 +435,7 @@ namespace exrPixeldata
 			//	}
 			//}
 			std::string rgbaStr = "<empty>";
-			const RegularScanline<channelCType32> scanline = u_scanlines[pixelRowIndex];
+			const RegularScanline<channelCType32> scanline = m_scanlines[pixelRowIndex];
 			channelCType32 a = scanline.a(pixelColumnIndex);
 			channelCType32 b = scanline.b(pixelColumnIndex);
 			channelCType32 g = scanline.g(pixelColumnIndex);
@@ -478,10 +466,10 @@ namespace exrPixeldata
 		std::string toStringAsRGBAPixels(const bool hex = false, const uint8_t fltPrecis = 6) const
 		{
 			std::string str = "";
-			for (uint32_t row = 0; row < u_scanlines.size(); row++)
+			for (uint32_t row = 0; row < m_scanlines.size(); row++)
 			{
 				str += "row [" + std::to_string(row) + "]: \n";
-				RegularScanline<channelCType32> scanline = u_scanlines[row];
+				RegularScanline<channelCType32> scanline = m_scanlines[row];
 				for (uint32_t col = 0; col < scanline.pixelsNum(); col++)
 				{
 					str += "\t pixel[" + std::to_string(row) + ", " + std::to_string(col) + "].RGBA = " + pixelRGBAString(row, col, hex, fltPrecis) + "\n";
@@ -493,9 +481,9 @@ namespace exrPixeldata
 		{
 			// note: order of channel names in Chlist is the same as the order of channels in PixelData
 			std::string pixeldataStr;
-			for (uint32_t i = 0; i < u_scanlines.size(); i++)	// scanline index = row
+			for (uint32_t i = 0; i < m_scanlines.size(); i++)	// scanline index = row
 			{
-				RegularScanline<channelCType32> scanline = u_scanlines[i];
+				RegularScanline<channelCType32> scanline = m_scanlines[i];
 				pixeldataStr += utils::tabs(tabsNum) + "[0x" + utils::hex(scanline.yFirstByteIndex(),4) + "; 0x" + utils::hex(scanline.yLastByteIndex(),4) + "] scanline.y = " + std::to_string(scanline._y()) + " \n";
 				pixeldataStr += utils::tabs(tabsNum) + "[0x" + utils::hex(scanline.valueSizeFirstByteIndex(),4) + "; 0x" + utils::hex(scanline.valueSizeLastByteIndex(),4) + "] dataSizeInBytes = " + std::to_string(scanline._valueSizeInBytes()) + "\n";
 				pixeldataStr += utils::tabs(tabsNum) + "entries: \n";
@@ -517,20 +505,20 @@ namespace exrPixeldata
 		}
 	
 		private:
-		std::vector<RegularScanline<channelCType32>> u_scanlines;
+		std::vector<RegularScanline<channelCType32>> m_scanlines;
 
 		void tryValidatePixelRowIndex(const uint32_t pixelRowIndex) const
 		{
-			if (pixelRowIndex < 0 or (u_scanlines.size() - 1) < pixelRowIndex)
+			if (pixelRowIndex < 0 or (m_scanlines.size() - 1) < pixelRowIndex)
 			{
-				throw invalidPixelRowIndex;
+				throw s_c_invalidPixelRowIndex;
 			}
 		}
 		void tryValidatePixelColumnIndex(const uint32_t pixelColumnIndex) const
 		{
-			if (pixelColumnIndex < 0 or (u_scanlines[0].pixelsNum() - 1) < pixelColumnIndex)
+			if (pixelColumnIndex < 0 or (m_scanlines[0].pixelsNum() - 1) < pixelColumnIndex)
 			{
-				throw invalidPixelColumnIndex;
+				throw s_c_invalidPixelColumnIndex;
 			}
 		}
 	
