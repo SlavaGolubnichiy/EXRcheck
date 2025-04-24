@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <string>
+#include "utils.h"
 
 namespace exr
 {
@@ -61,21 +62,66 @@ namespace exr2
 			inline constexpr uint32_t multiDeepScanOrTile	= 0x00001800;	// bits 9, 10, 11, 12: 0, ~, 1, 1
 		}
 
+		namespace channel
+		{
+			const enum datatype
+			{
+				min		= 0x00,
+				UINT	= 0x00,
+				HALF	= 0x01,
+				FLOAT	= 0x02,
+				max		= 0x02
+			};
+
+			std::string channelDataTypeName(const uint32_t channelDataTypeByteValue)
+			{
+				if (channelDataTypeByteValue < datatype::min or datatype::max < channelDataTypeByteValue)
+				{
+					throw 
+						std::logic_error
+						(
+							"Channel data type byte value = " + utils::hex(channelDataTypeByteValue, 2*sizeof(channelDataTypeByteValue)) + 
+							"is out of valid range [" + utils::hex(datatype::min) + "; " + utils::hex(datatype::max) + "]"
+						);
+				}
+				return (channelDataTypeByteValue == exr2::consta::channel::datatype::UINT) ? "UINT" : 
+					(channelDataTypeByteValue == exr2::consta::channel::datatype::HALF) ? "HALF" : 
+					(channelDataTypeByteValue == exr2::consta::channel::datatype::FLOAT) ? "FLOAT" : "EXR2_INVALID_VALUE_OF_CHANNEL_DATA_TYPE_BYTE";
+			}
+		}
+
+		namespace compression
+		{
+			static const enum value
+			{
+				NO		= 0x00,
+				RLE		= 0x01,
+				ZIPS	= 0x02,
+				ZIP		= 0x03,
+				PIZ		= 0x04,
+				PXR24	= 0x05,
+				B44		= 0x06,
+				B44A	= 0x07,
+				DWAA	= 0x08,
+				DWAB	= 0x09
+			};
+		}
+
 		static std::string compressionName(const uint8_t compressionValue)
 		{
 			std::string name;
 			switch(compressionValue)
 			{
-				case 0: name = "NO_COMPRESSION"; break;
-				case 1: name = "RLE_COMPRESSION"; break;
-				case 2: name = "ZIPS_COMPRESSION"; break;
-				case 3: name = "ZIP_COMPRESSION"; break;
-				case 4: name = "PIZ_COMPRESSION"; break;
-				case 5: name = "PXR24_COMPRESSION"; break;
-				case 6: name = "B44_COMPRESSION"; break;
-				case 7: name = "B44A_COMPRESSION"; break;
-				case 8: name = "DWAA_COMPRESSION"; break;
-				case 9: name = "DWAB_COMPRESSION"; break;
+				case compression::value::NO:	name = "NO_COMPRESSION"; break;
+				case compression::value::RLE:	name = "RLE_COMPRESSION"; break;
+				case compression::value::ZIPS:	name = "ZIPS_COMPRESSION"; break;
+				case compression::value::ZIP:	name = "ZIP_COMPRESSION"; break;
+				case compression::value::PIZ:	name = "PIZ_COMPRESSION"; break;
+				case compression::value::PXR24: name = "PXR24_COMPRESSION"; break;
+				case compression::value::B44:	name = "B44_COMPRESSION"; break;
+				case compression::value::B44A:	name = "B44A_COMPRESSION"; break;
+				case compression::value::DWAA:	name = "DWAA_COMPRESSION"; break;
+				case compression::value::DWAB:	name = "DWAB_COMPRESSION"; break;
 				default:
 				{
 					throw std::invalid_argument("OpenEXR compression can not have the specified value. Check the documentation.");

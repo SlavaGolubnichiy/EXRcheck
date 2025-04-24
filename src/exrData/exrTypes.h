@@ -99,14 +99,14 @@ namespace exrTypes
 		const std::runtime_error ex_channelNotAnalysed = std::runtime_error("Channel is not yet analysed. Call analyseChannel() beforehand.");
 		uint32_t channel_firstByteIndex = 0, channel_lastByteIndex = 0;
 		uint32_t name_firstByteIndex = 0, name_lastByteIndex = 0;
-		uint32_t pixelType_firstByteIndex = 0, pixelType_lastByteIndex = 0;
+		uint32_t channelType_firstByteIndex = 0, channelType_lastByteIndex = 0;
 		uint32_t pLinear_firstByteIndex = 0, pLinear_lastByteIndex = 0;
 		uint32_t reserved_firstByteIndex = 0, reserved_lastByteIndex = 0;
 		uint32_t samplingX_firstByteIndex = 0, samplingX_lastByteIndex = 0;
 		uint32_t samplingY_firstByteIndex = 0, samplingY_lastByteIndex = 0;
 		bool isAnalysed = false;
 		std::string u_name = "";
-		uint32_t pixelType = 0xFFFFFFFF;
+		uint32_t channelType = 0xFFFFFFFF;
 		uint8_t pLinear = 0xFF;
 		std::vector<uint8_t> reserved = {0xFF, 0xFF, 0xFF};		// OpenEXR: 3 reserved bytes
 		int32_t samplingX = 0;
@@ -126,12 +126,12 @@ namespace exrTypes
 			name_firstByteIndex = channelFirstByteIndex;
 			u_name = exrTypes::readCString(bytes.cbegin() + name_firstByteIndex, bytes.cend());
 			name_lastByteIndex = name_firstByteIndex + u_name.length();	// no -1 because counting +1 '\0'
-			// channel pixel type
-			pixelType_firstByteIndex = name_lastByteIndex + 1;
-			pixelType_lastByteIndex = pixelType_firstByteIndex + sizeof(pixelType)-1; // int32_t is 4 bytes => offset= 3
-			pixelType = exrTypes::readUint32((bytes.cbegin() + pixelType_firstByteIndex)._Ptr);
+			// channel data type
+			channelType_firstByteIndex = name_lastByteIndex + 1;
+			channelType_lastByteIndex = channelType_firstByteIndex + sizeof(channelType)-1; // int32_t is 4 bytes => offset= 3
+			channelType = exrTypes::readUint32((bytes.cbegin() + channelType_firstByteIndex)._Ptr);
 			// channel pLinear
-			pLinear_firstByteIndex = pixelType_lastByteIndex + 1;
+			pLinear_firstByteIndex = channelType_lastByteIndex + 1;
 			pLinear_lastByteIndex = pLinear_firstByteIndex;
 			pLinear = bytes[pLinear_firstByteIndex];
 			// channel 3 reserved bytes
@@ -154,6 +154,8 @@ namespace exrTypes
 		}
 
 		std::string name() const { return u_name; }
+		
+		uint32_t type() const { return channelType; }
 
 		uint32_t lastByteIndex() const
 		{
@@ -182,11 +184,8 @@ namespace exrTypes
 				tabs += "\t";
 			}
 			printf("%s channel [0x%4.4X ~ 0x%4.4X] name= \t\'%s\'+\'\\0\' \n", tabs.c_str(), name_firstByteIndex, name_lastByteIndex, u_name.c_str());
-			const char* ch0PxTypeStr = 
-				(pixelType == PIXELTYPE::UINT) ? "UINT" : 
-				(pixelType == PIXELTYPE::HALF) ? "HALF" : 
-				(pixelType == PIXELTYPE::FLOAT) ? "FLOAT" : "UNDEFINED TYPE";
-			printf("%s\t [0x%4.4X ~ 0x%4.4X] type = \t0x%8.8X (%s) \n", tabs.c_str(), pixelType_firstByteIndex, pixelType_lastByteIndex, pixelType, ch0PxTypeStr);
+			std::string channelTypeStr = exr2::consta::channel::channelDataTypeName(channelType);
+			printf("%s\t [0x%4.4X ~ 0x%4.4X] type = \t0x%8.8X (%s) \n", tabs.c_str(), channelType_firstByteIndex, channelType_lastByteIndex, channelType, channelTypeStr.c_str());
 			printf("%s\t [0x%4.4X _ ______] pLinear = \t0x%2.2X \n", tabs.c_str(), pLinear_firstByteIndex, pLinear);
 			printf("%s\t [0x%4.4X ~ 0x%4.4X] reserved = \t0x%2.2X 0x%2.2X 0x%2.2X \n", tabs.c_str(), reserved_firstByteIndex, reserved_lastByteIndex, reserved[0], reserved[1], reserved[2]);
 			printf("%s\t [0x%4.4X ~ 0x%4.4X] xSamplimg = \t0x%8.8X = %i \n", tabs.c_str(), samplingX_firstByteIndex, samplingX_lastByteIndex, samplingX, samplingX);
@@ -201,13 +200,10 @@ namespace exrTypes
 			{
 				tabs += "\t";
 			}
-			const std::string chPxTypeStr = 
-				(pixelType == PIXELTYPE::UINT) ? "UINT" : 
-				(pixelType == PIXELTYPE::HALF) ? "HALF" : 
-				(pixelType == PIXELTYPE::FLOAT) ? "FLOAT" : "UNDEFINED TYPE";
+			const std::string channelTypeStr = exr2::consta::channel::channelDataTypeName(channelType);
 			return 
 				tabs + " channel [0x" + utils::hex(name_firstByteIndex,4) + " ~ 0x" + utils::hex(name_lastByteIndex,4) + "] name \t= \'" + u_name + "\'+\'\\0\'\n"
-				+ tabs + "\t [0x" + utils::hex(pixelType_firstByteIndex,4) + " ~ 0x" + utils::hex(pixelType_lastByteIndex,4) + "] type \t= 0x" + utils::hex(pixelType,2) + " = " + chPxTypeStr + "\n"
+				+ tabs + "\t [0x" + utils::hex(channelType_firstByteIndex,4) + " ~ 0x" + utils::hex(channelType_lastByteIndex,4) + "] type \t= 0x" + utils::hex(channelType,2) + " = " + channelTypeStr + "\n"
 				+ tabs + "\t [0x" + utils::hex(pLinear_firstByteIndex,4) + " ~ ______] pLinear \t= 0x" + utils::hex(pLinear,2) + "\n"
 				+ tabs + "\t [0x" + utils::hex(reserved_firstByteIndex,4) + " ~ 0x" + utils::hex(reserved_lastByteIndex,4) + "] reserved \t= 0x" + utils::hex(reserved[0], 2) + " 0x" + utils::hex(reserved[1], 2) + " 0x" + utils::hex(reserved[2], 2) + "\n"
 				+ tabs + "\t [0x" + utils::hex(samplingX_firstByteIndex,4) + " ~ 0x" + utils::hex(samplingX_lastByteIndex,4) + "] xSampling \t= 0x" + utils::hex(samplingX,8) + " = " + std::to_string(samplingX) + "\n"
@@ -215,12 +211,7 @@ namespace exrTypes
 		}
 
 		private:
-		const enum PIXELTYPE
-		{
-			UINT = 0x00,
-			HALF = 0x01,
-			FLOAT = 0x02
-		};
+
 	};
 
 	// ----
@@ -345,9 +336,19 @@ namespace exrTypes
 			}
 		}
 
+		void tryValidateChannelIndex(const uint32_t channelIndex) const
+		{
+			uint32_t channelIndexMin = 0;
+			uint32_t channelIndexMax = u_channels.size()-1;
+			if (channelIndex < channelIndexMin or channelIndexMax < channelIndex)
+			{
+				throw std::invalid_argument("(channelIndex) = " + std::to_string(channelIndex) + " is out of valid range [" + std::to_string(channelIndexMin) + "; " + std::to_string(channelIndexMax) + "]");
+			}
+		}
+
 		/// <summary> Implements interface: returns string of name of OpenEXR-defined data type stored within this class. </summary>
 		/// <returns> std::string name of OpenEXR-defined type of data stored within this class </returns>
-		std::string type() const override { return exr::consta::Type::chlist; }
+		std::string type() const override { return exr::consta::Type::chlist; }		// rename to attrib_type()
 		/// <summary>
 		///		Implements interface: returns number of bytes that OpenEXR data stored within this class takes, 
 		///		which must be equal to the size (in bytes) of value of corresponding OpenEXR-defined data type 
@@ -364,6 +365,12 @@ namespace exrTypes
 			return sizeBytes;
 		}
 		
+		std::string channelName(const uint32_t channelIndex) const
+		{
+			tryValidateChannelIndex(channelIndex);
+			return u_channels[channelIndex].name();
+		}
+
 		std::vector<std::string> channelsNames() const
 		{
 			std::vector<std::string> chNames;
@@ -372,6 +379,12 @@ namespace exrTypes
 				chNames.push_back(u_channels[i].name());
 			}
 			return chNames;
+		}
+
+		std::string channelDataTypeName(const uint32_t channelIndex) const
+		{
+			tryValidateChannelIndex(channelIndex);
+			return exr2::consta::channel::channelDataTypeName(u_channels[channelIndex].type());
 		}
 
 		/// <summary> Implements interface: returns string containing values stored within class. </summary>
@@ -396,10 +409,12 @@ namespace exrTypes
 		///		Get number of channels stored in the Chlist channel list.
 		/// </summary>
 		/// <returns> number of channels, this object currently is storing </returns>
-		uint32_t length() const { return u_channels.size(); }
+		uint32_t channelsNum() const { return u_channels.size(); }
 
 		private:
 		std::vector<Channel> u_channels;
+
+
 	};
 
 	/// <summary>
@@ -752,13 +767,13 @@ namespace exrTypes
 		///		This implementation is final and can not be overridden by derived class.
 		/// </summary>
 		/// <returns> std::string of the specified name of attribute </returns>
-		virtual std::string name() const final { return u_name; }	// un-overridable in derived classes, Attrib.name
+		virtual std::string name() const final { return u_name; }	// un-overridable in derived classes, Attrib.name		// rename to attrib_name()
 		/// <summary>
 		///		Get string with the name of OpenEXR data type of OpenEXR attribute (value data field is expected to be added in the derived class).
 		///		This implementation is final and can not be overridden by derived class.
 		/// </summary>
 		/// <returns> std::string of the name of the data type stored by attribute value </returns>
-		virtual std::string type() const final { return	u_type; }	// type of attrib = type of value
+		virtual std::string type() const final { return	u_type; }	// type of attrib = type of value	// rename to value_type()
 		/// <summary>
 		///		Get number of bytes that attribute value takes (value data field is expected to be added in the derived class).
 		///		This implementation is final and can not be overridden by derived class.
@@ -893,8 +908,14 @@ namespace exrTypes
 			tryValidateTypeIs(exr::consta::Type::chlist);
 		}
 		
+		std::string channelName(const uint32_t const channelIndex)
+		{
+			u_chlist.tryValidateChannelIndex(channelIndex);
+			return u_chlist.channelName(channelIndex);
+		}
+		
 		std::vector<std::string> channelsNames() const { return u_chlist.channelsNames(); }
-		uint32_t channelsNum() const { return u_chlist.length(); }
+		uint32_t channelsNum() const { return u_chlist.channelsNum(); }
 
 		/// <summary>
 		///		Warning: 
@@ -906,6 +927,20 @@ namespace exrTypes
 		std::string toString(const uint8_t tabsNum = 0) const
 		{
 			return AttribBase::toString(tabsNum, &u_chlist);
+		}
+
+		std::string channelDataTypeName(const uint32_t channelIndex) const
+		{
+			uint32_t channelIndexMin = 0;
+			uint32_t channelIndexMax = u_chlist.channelsNum()-1;
+			if (channelIndex < channelIndexMin or channelIndexMax < channelIndex)
+			{
+				throw std::invalid_argument
+				(
+					"(channelIndex) = " + std::to_string(channelIndex) + " is out of valid "
+					"range [" + std::to_string(channelIndexMin) + "; " + std::to_string(channelIndexMax) + "]");
+			}
+			return u_chlist.channelDataTypeName(channelIndex);
 		}
 
 		private:
@@ -935,6 +970,18 @@ namespace exrTypes
 			u_compression(Compression(filebytes, value_firstByteIndex()))
 		{
 			tryValidateTypeIs(exr::consta::Type::compression);
+		}
+
+		std::string compressionName() const { return u_compression.name(); }
+
+		/// <summary>
+		///		Get the compression value byte stored in the .exr file.
+		///		See OpenEXR technicla documents to identify the compression algorithm used in this .exr file.
+		/// </summary>
+		/// <returns> uint6_t - byte value stored in the .exr file that represents compression algorithm .exr file is using </returns>
+		uint8_t value() const
+		{
+			return u_compression.value();
 		}
 		/// <summary>
 		///		Warning: 
@@ -1058,6 +1105,9 @@ namespace exrTypes
 		{
 			tryValidateTypeIs(exr::consta::Type::float32);
 		}
+
+		float value() const { return u_float32.value(); }
+
 		/// <summary>
 		///		Warning: 
 		///		this does not override the toString() method from the base class, instead this method calls it specifying
@@ -1179,6 +1229,10 @@ namespace exrTypes
 			for (uint32_t i = offsetTableFirstByteIndex, offsetIndex = 0; offsetIndex < offsetTableLen; i += sizeof(uint64_t), offsetIndex++)
 			{
 				uint64_t offset = exrTypes::readUint64(filebytes.data()+i);
+				if(offset < 0 or filebytes.size()-1 < offset)	// if offset is out of valid range [0; filebytes.size-1]
+				{
+					throw std::logic_error("Invalid (offset) value received: (offset=" + std::to_string(offset) + ") is out of valid range [0; filebytes.size()-1]");
+				}
 				u_offsetTable.push_back(utils::IndexedValue(i, i+OffsetTable::offsetValueSizeInBytes-1, offset));
 			}
 		}

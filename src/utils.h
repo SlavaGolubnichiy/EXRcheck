@@ -80,6 +80,12 @@ namespace utils
 
 	// static functions
 
+	static void waitForUser()
+	{
+		printf("Press \'Enter\' to continue...    ");
+		std::cin.get();
+	}
+
 	static std::string tabs(const uint32_t tabsNum)
 	{
 		std::string tabs = "";
@@ -258,7 +264,7 @@ namespace utils
 			std::ifstream file(filename, std::fstream::in | std::ifstream::binary);
 			if (!file)
 			{
-				throw std::runtime_error("Error opening file! Check the file is in the same directory with .exe / VS-project used.");
+				throw std::runtime_error("Error opening file " + std::string(filename) + ". Check the file is in the same directory with .exe");
 			}
 			std::vector<ui8> filebytesVec(std::istreambuf_iterator<char>(file), {});		// read file (copy all data into "filebytes")
 			file.close();

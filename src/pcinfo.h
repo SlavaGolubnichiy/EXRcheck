@@ -1,5 +1,30 @@
 #pragma once
 
+// OS
+#if defined(__APPLE__)
+	#define OS_MACOS 1
+#elif defined(__linux__)
+	#define OS_LINUX 1
+#elif defined(_WIN32)
+	#define OS_WINDOWS 1
+#else
+	#define OS_UNKNOWN 1
+#endif
+// Architecture
+#if defined(__x86_64__) || defined(_M_X64) || OS_WINDOWS && defined(_WIN64)
+	#define ARCH_X64 1
+#elif defined(__i386__) || defined(_M_IX86) || OS_WINDOWS && !defined(_WIN64)
+	#define ARCH_X86 1
+#elif defined(__aarch64__) || defined(_M_ARM64)
+	#define ARCH_ARM64 1
+#elif defined(__arm__) || defined(_M_ARM)
+	#define ARCH_ARM32 1
+#elif defined(__powerpc__) || defined(__powerpc) || defined(__ppc__) || defined(__PPC__)	// old MacOS
+	#define ARCH_POWERPC 1
+#else
+	#define ARCH_UNKNOWN 1
+#endif
+
 namespace pcinfo
 {
 	// works with C++ 11.0 and earlier
@@ -40,8 +65,8 @@ namespace pcinfo
 		System()
 			: u_isBigEndian(isBigEndianPC())
 		{
-
 		}
+
 		std::string isBigEndianToString() const
 		{
 			switch(u_isBigEndian)
